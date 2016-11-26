@@ -1,24 +1,15 @@
-// Uses requestAnimationFrame Polyfill
-// http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
-// ... as an external resources hosted with Assets
-
-class Baphomet {
+class Animation {
   constructor(canvasId, fillColor){
-    this.squareSize = 30;
+    this.squareSize = 60; //gridSize;
     this.fillColor = fillColor;
     this.canvasId = canvasId;
-    this.xDis = 10;
-    this.yDis = 10;
     this.animationFrameId = 0;
-    this.memory; //The grid.
-
-    //this.startup();
   }
 
   initMemoryArray() {
-    this.memory = new Array(this.squareSize -1);
+    this.memory = new Array(this.squareSize);
     for (let i = 0; i < this.squareSize; i += 1) {
-      this.memory[i] = new Array(this.squareSize -1);
+      this.memory[i] = new Array(this.squareSize);
     }
   }
 
@@ -26,8 +17,8 @@ class Baphomet {
     this.drawSquare(this.posX, this.posY);
     this.posX++
     if (this.posX >= this.squareSize) {
-      this.posX = this.posY;
       this.posY++;
+      this.posX = this.posY;
 
       if (this.posY >= this.squareSize) {
         this.checkEnd();
@@ -55,6 +46,10 @@ class Baphomet {
     this.context = document.getElementById(this.canvasId).getContext('2d');
     this.canvas.width = width;
     this.canvas.height = height;
+    this.xDis = width/this.squareSize;
+    this.yDis = height/this.squareSize;
+    console.log('xDis:', this.xDis);
+    console.log('yDis:', this.yDis);
     this.context.fillStyle = this.fillColor;
 
     this.posX = 0;
@@ -77,5 +72,5 @@ class Baphomet {
   }
 }
 
-const baphomet = new Baphomet('canvas', '#FF0000');
+const baphomet = new Animation('canvas', '#FF0000');
 baphomet.startup();
