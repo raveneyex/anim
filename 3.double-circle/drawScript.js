@@ -66,7 +66,7 @@ class Circle {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.context.strokeStyle = this.fillColor ;
-    this.context.fillStyle = this.fillColor;
+    //this.context.fillStyle = this.fillColor;
 
     this.startAngle = 0;
     this.endAngle = 2 * Math.PI;
@@ -87,7 +87,7 @@ class Circle {
 
   end(){
     cancelAnimationFrame(this.animationFrameId);
-    //this.startup();
+    this.startup();
   }
 }
 

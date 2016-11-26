@@ -12,7 +12,7 @@ class Circle {
     this.context.arc(300, 300, 250, this.startAngle, endAngle);
     this.context.stroke();
 
-    if (endAngle > this.endAngle) {
+    if (endAngle >= this.endAngle) {
       this.end()
     }
   }
@@ -25,6 +25,7 @@ class Circle {
   startup() {
     this.canvas = document.getElementById(this.canvasId);
     this.context = document.getElementById(this.canvasId).getContext('2d');
+    this.context.clearRect(0,0, 600, 600);
     this.context.strokeStyle = this.fillColor ;
 
     this.startAngle = 0;
