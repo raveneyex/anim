@@ -5,53 +5,52 @@ class Circle {
     this.animationFrameId = 0;
   }
 
+  atomicStep(init, radius, backwards) {
+    if(init){
+      this.context.beginPath();
+    }
+    let done = this.drawCircle(radius, backwards);
+    this.step++;
+    if (done){
+      this.context.closePath();
+      this.step = 0;
+    }
+    return done;
+  }
+
   oneStep() {
-    if(!this.first && !this.second){
-      if(this.firstRun){
-        this.firstRun = false;
-        console.log("Opening Path C1");
-        this.context.beginPath();
-      }
-      this.first = this.drawCircle(false);
-      this.step++;
-      if(this.first){
-        console.log('Closing path C1');
-        this.context.closePath();
-        this.step = 0;
+
+    if (!this.first && !this.second) {
+      this.first = this.atomicStep(this.firstRun, 250, false)
+      if (this.firstRun) {
+          this.firstRun = false;
       }
     }
 
-    if (this.first && !this.second) {
-      if(this.secondRun){
-        this.context.strokeStyle = '#FFFFFF';
+    if(this.first && !this.second) {
+      this.context.strokeStyle = '#FFFFFF';
+      this.second = this.atomicStep(this.secondRun, 220, true);
+      if (this.secondRun) {
         this.secondRun = false;
-        console.log("Opening Path C2");
-        this.context.beginPath();
-      }
-      this.second = this.drawCircle(true);
-      this.step++;
-      if(this.second) {
-        console.log('Closing path C2');
-        this.context.closePath();
       }
     }
 
-    if(this.first && this.second) {
+    if (this.first && this.second) {
       this.end();
     }
   }
 
-  drawCircle(counter){
+  drawCircle(radius, counter){
     let endAngle = this.stepSize * this.step,
         done = endAngle >= this.endAngle ? true: false;
 
     if (!counter) {
-      this.context.arc(300, 300, 250, this.startAngle, endAngle);
+      this.context.arc(300, 300, radius, this.startAngle, endAngle);
       this.context.stroke();
     }
 
     if (counter){
-      this.context.arc(300, 300, 210, endAngle, this.startAngle);
+      this.context.arc(300, 300, radius, endAngle, this.startAngle, true);
       this.context.stroke();
 
     }
