@@ -15,6 +15,7 @@ class Pentagram {
     }
 
     calculateWayPoints(vertices) {
+        //taken from: http://stackoverflow.com/a/23941786
         let wayPoints = [];
         for (let i = 1; i < vertices.length; i += 1) {
             let pt0 = vertices[i - 1],
@@ -96,8 +97,9 @@ class Pentagram {
         this.endAngle = 2 * Math.PI;
         this.stepSize = this.endAngle/300;
         this.step = 0;
-        this.first = false;
-        this.second = false;
+
+        this.first = false; //1st circle already drawn?
+        this.second = false; //2nd circle already drawn?
 
         this.drawLoop = () => {
             this.animationFrameId = requestAnimationFrame(this.drawLoop);
