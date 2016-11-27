@@ -1,141 +1,110 @@
 class Pentagram {
-  constructor({canvasId, strokeColor}){
-    this.fillColor = strokeColor;
-    this.canvasId = canvasId;
-    this.animationFrameId = 0;
-  }
-
-  atomicStep(radius, backwards) {
-    this.context.beginPath();
-    let done = this.drawCircle(radius, backwards);
-    this.step++;
-    if (done){
-      //this.context.closePath();
-      this.step = 0;
-    }
-    return done;
-  }
-
-  oneStep() {
-
-    if (!this.first && !this.second) {
-      this.first = this.atomicStep(250, false)
-      if (this.firstRun) {
-          this.firstRun = false;
-      }
+    constructor({canvasId, strokeColor}){
+        this.fillColor = strokeColor;
+        this.canvasId = canvasId;
+        this.animationFrameId = 0;
+        let vertices = [
+            {x: 521, y: 304 },
+            {x: 125, y: 435 },
+            {x: 377, y: 96 },
+            {x: 377, y: 508 },
+            {x: 125, y: 169 },
+            {x: 521, y: 304}
+        ];
+        this.wayPoints = this.calculateWayPoints(vertices);
     }
 
-    if(this.first && !this.second) {
-      this.second = this.atomicStep(220, true);
-      if (this.secondRun) {
-        this.secondRun = false;
-      }
+    calculateWayPoints(vertices) {
+        let wayPoints = [];
+        for (let i = 1; i < vertices.length; i += 1) {
+            let pt0 = vertices[i - 1],
+                pt1 = vertices[i],
+                dx = pt1.x - pt0.x,
+                dy = pt1.y - pt0.y;
+            for (let j = 0; j < 100; j += 1) {
+                let x = pt0.x + dx * j/100,
+                    y = pt0.y + dy * j/100;
+                wayPoints.push({x, y});
+            }
+        }
+        return wayPoints;
     }
 
-    if (this.first && this.second) {
-      this.drawLine1();
-      this.drawLine2();
-      this.drawLine3();
-      this.drawLine4();
-      this.drawLine5();
-      this.end();
+    atomicStep(radius, backwards) {
+        this.context.beginPath();
+        let done = this.drawCircle(radius, backwards);
+        this.step++;
+        if (done){
+            this.step = 0;
+        }
+        return done;
     }
-  }
 
-  drawLine1(){
-    this.context.beginPath();
-    this.context.moveTo(300, 520);
-    this.context.lineTo(147, 147);
-    this.context.stroke();
-    this.context.closePath();
-  }
+    oneStep() {
+        if (!this.first && !this.second) {
+            this.first = this.atomicStep(250);
+        }
 
-  drawLine2(){
-    this.context.beginPath();
-    this.context.moveTo(147, 147);
-    this.context.lineTo(498, 400);
-    this.context.stroke();
-    this.context.closePath();
-  }
+        if(this.first && !this.second) {
+            this.second = this.atomicStep(220);
+            if (this.second) {
+                this.step = 1;
+            }
+        }
 
-  drawLine3(){
-    this.context.beginPath();
-    this.context.moveTo(498, 400);
-    this.context.lineTo(104, 400);
-    this.context.stroke();
-    this.context.closePath();
-  }
+        if (this.first && this.second) {
+            if (this.step < this.wayPoints.length) {
+                this.drawLine(this.wayPoints[this.step - 1], this.wayPoints[this.step]);
+                this.step += 1;
+            } else {
+                this.end();
+            }
+        }
+    }
 
-  drawLine4(){
-    this.context.beginPath();
-    this.context.moveTo(104, 400);//451 144
-    this.context.lineTo(451, 144);
-    this.context.stroke();
-    this.context.closePath();
-  }
+    drawLine(startPoint, endPoint) {
+        this.context.beginPath();
+        this.context.moveTo(startPoint.x, startPoint.y);
+        this.context.lineTo(endPoint.x, endPoint.y);
+        this.context.stroke();
+    }
 
-  drawLine5(){
-    this.context.beginPath();
-    this.context.moveTo(451, 144);//4
-    this.context.lineTo(300, 520);
-    this.context.stroke();
-    this.context.closePath();
-  }
-
-  drawCircle(radius, counter){
-    let endAngle = this.stepSize * this.step,
+    drawCircle(radius){
+        let endAngle = this.stepSize * this.step,
         done = endAngle >= this.endAngle ? true: false;
 
-    if (!counter) {
-      this.context.arc(300, 300, radius, this.startAngle, endAngle);
-      this.context.stroke();
+        this.context.arc(300, 300, radius, this.startAngle, endAngle);
+        this.context.stroke();
+
+        return done;
     }
 
-    if (counter){
-      this.context.arc(300, 300, radius, endAngle, this.startAngle, true);
-      this.context.stroke();
-
+    end() {
+        cancelAnimationFrame(this.animationFrameId);
+        //this.startup();
     }
 
-    return done;
-  }
+    startup() {
+        this.canvas = document.getElementById(this.canvasId);
+        this.context = document.getElementById(this.canvasId).getContext('2d');
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-  end() {
-    cancelAnimationFrame(this.animationFrameId);
-    //this.startup();
-  }
+        this.context.strokeStyle = this.fillColor ;
+        this.context.lineWidth = 2;
 
-  startup() {
-    this.canvas = document.getElementById(this.canvasId);
-    this.context = document.getElementById(this.canvasId).getContext('2d');
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.startAngle = 0;
+        this.endAngle = 2 * Math.PI;
+        this.stepSize = this.endAngle/300;
+        this.step = 0;
+        this.first = false;
+        this.second = false;
 
-    this.canvas.onmousemove = function(event) {
-      let x = event.clientX,
-          y = event.clientY;
-      document.getElementById('coordinates').innerHTML="Coordinates: (" + x + "," + y + ")";
-      console.log("Event:", event);
+        this.drawLoop = () => {
+            this.animationFrameId = requestAnimationFrame(this.drawLoop);
+            this.oneStep();
+        }
+        this.drawLoop();
     }
-
-    this.context.strokeStyle = this.fillColor ;
-    //this.context.fillStyle = this.fillColor;
-
-    this.startAngle = 0;
-    this.endAngle = 2 * Math.PI;
-    this.stepSize = this.endAngle/300;
-    this.step = 0;
-    this.first = false;
-    this.second = false;
-    this.firstRun = true;
-    this.secondRun = true;
-
-    this.drawLoop = () => {
-      this.animationFrameId = requestAnimationFrame(this.drawLoop);
-      this.oneStep();
-    }
-    this.drawLoop();
-
-  }
 
 }
 
