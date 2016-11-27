@@ -88,10 +88,6 @@ class Circle {
 
   }
 
-  end(){
-    cancelAnimationFrame(this.animationFrameId);
-    //this.startup();
-  }
 }
 
 const baphomet = new Circle({canvasId:'canvas', strokeColor: '#FF0000'});
