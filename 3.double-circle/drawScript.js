@@ -7,24 +7,18 @@ class Circle {
 
   oneStep() {
     if(!this.first && !this.second){
-      if(this.firstRun){
-        this.firstRun = false;
-        this.context.beginPath();
-      }
+      this.context.beginPath();
       this.first = this.drawCircle(false);
       this.step++;
       if(this.first){
         this.context.closePath();
         this.step = 0;
+        this.context.strokeStyle = '#FFFFFF';
       }
     }
 
     if (this.first && !this.second) {
-      if(this.secondRun){
-        this.context.strokeStyle = '#FFFFFF';
-        this.secondRun = false;
-        this.context.beginPath();
-      }
+      this.context.beginPath();
       this.second = this.drawCircle(true);
       this.step++;
       if(this.second) {
@@ -47,7 +41,7 @@ class Circle {
     }
 
     if (counter){
-      this.context.arc(300, 300, 210, endAngle, this.startAngle);
+      this.context.arc(300, 300, 210, endAngle, this.startAngle, true);
       this.context.stroke();
 
     }
@@ -74,8 +68,6 @@ class Circle {
     this.step = 0;
     this.first = false;
     this.second = false;
-    this.firstRun = true;
-    this.secondRun = true;
 
     this.drawLoop = () => {
       this.animationFrameId = requestAnimationFrame(this.drawLoop);
