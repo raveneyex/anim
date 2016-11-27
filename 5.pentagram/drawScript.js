@@ -1,5 +1,8 @@
 class Pentagram {
     constructor({canvasId, strokeColor}){
+        this.encoder = new GIFEncoder();
+        this.encoder.setRepeat(0);
+        this.encoder.setDelay(1);
         this.fillColor = strokeColor;
         this.canvasId = canvasId;
         this.animationFrameId = 0;
@@ -61,6 +64,7 @@ class Pentagram {
                 this.end();
             }
         }
+        this.encoder.addFrame(document.getElementById('canvas').getContext('2d'));
     }
 
     drawLine(startPoint, endPoint) {
@@ -82,7 +86,16 @@ class Pentagram {
 
     end() {
         cancelAnimationFrame(this.animationFrameId);
+        this.encoder.finish();
+        let binary_gif = this.encoder.stream().getData(),
+            data_url = 'data:image/gif;base64,'+encode64(binary_gif);
+
+        this.displayLink(data_url);
         //this.startup();
+    }
+
+    displayLink(data){
+        document.getElementById('link').innerHTML = '<a href="' + data + '">GIF</a>';
     }
 
     startup() {
@@ -102,13 +115,16 @@ class Pentagram {
         this.second = false; //2nd circle already drawn?
 
         this.drawLoop = () => {
-            this.animationFrameId = requestAnimationFrame(this.drawLoop);
+            this.animationFrameId = requestAnimationFrame(this.drawLoop.bind(this));
             this.oneStep();
         }
+        this.encoder.start();
         this.drawLoop();
     }
 
 }
+
+
 
 const baphomet = new Pentagram({canvasId:'canvas', strokeColor: '#FF0000'});
 baphomet.startup();
